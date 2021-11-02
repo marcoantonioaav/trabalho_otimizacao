@@ -1,4 +1,4 @@
-linhas = [i.strip().split() for i in open("VA01.dat").readlines()]
+linhas = [i.strip().split() for i in open("./data/VA01.dat").readlines()]
 
 
 n = int(linhas[0][0])
