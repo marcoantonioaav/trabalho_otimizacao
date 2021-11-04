@@ -3,37 +3,36 @@ import random
 from numpy.core.numeric import Infinity
 import numpy as np
 
-n = 0
-k = 1
-p = []
-P =  [0.8*sum(p)*(1/k)]*k
-cI = []
-cD = []
+from read_file import ReadInstance
+from logging import log
+
+instance = None
 
 def evaluate(g):
     individual_profit = 0
-    for i in range(n):
+    for i in range(instance.n):
         if g[i] != 0:
-            individual_profit += cI[i]
+            individual_profit += instance.cI[i]
     pair_profit = 0
-    for i in range(n):
-        for j in range(n):
+    for i in range(instance.n):
+        for j in range(instance.n):
             if g[i] == g[j]:
-                pair_profit += cD[i][j]
+                pair_profit += instance.cP[i][j]
     return individual_profit + (pair_profit/2)
 
 def is_valid_solution(g):
-    total_weight = np.zeros(k) #inicializa os pesos com zero
-    for i in range(n): 
-        total_weight[g[i]] += p[i] #soma o peso atual em cada avião
-    for i in range(k):
+    total_weight = np.zeros(instance.k) #inicializa os pesos com zero
+    for i in range(instance.n): 
+        if g[i] > 0:
+            total_weight[g[i]-1] += instance.p[i] #soma o peso atual em cada avião
+    for i in range(instance.k):
     #se algum dos pesos ultrapassa a capacidade máxima, a solução não é válida
-        if total_weight[i]>P[i]:
+        if total_weight[i]>instance.P[i]:
             return False
     return True
 
 def validate_solution(g):
-    occupied = list(range(n)) #marca os elementos não nulos de g 
+    occupied = list(range(instance.n)) #marca os elementos não nulos de g 
     while(not is_valid_solution(g)): #enquanto g não é válido
         choice = random.choice(occupied) 
         #sorteia um dos elementos não nulos
@@ -42,9 +41,9 @@ def validate_solution(g):
     return g
 
 def initial_solution():
-    g = [None]*n #gera novo vetor de inteiros
-    for i in range(n):
-        g[i] = random.randint(1, k) #inicializa com valores de 1 até k
+    g = [None]*instance.n #gera novo vetor de inteiros
+    for i in range(instance.n):
+        g[i] = random.randint(1, instance.k) #inicializa com valores de 1 até k
     return validate_solution(g)
 
 def tournament(participants):
@@ -61,22 +60,22 @@ def tournament(participants):
 
 def crossover(f, s, crossover_rate):
     if random.random() < crossover_rate:
-        p = random.randint(0, n-1)	#randomiza ponto de cruzamento
-        f_tail = f[p:] #separa ambos no ponto de cruzamento
-        s_tail = s[p:]
-        f_head = f[:p]
-        s_head = s[:p]
+        point = random.randint(0, instance.n-1)	#randomiza ponto de cruzamento
+        f_tail = f[point:] #separa ambos no ponto de cruzamento
+        s_tail = s[point:]
+        f_head = f[:point]
+        s_head = s[:point]
         f = f_head + s_tail #concatena as partes gerando dois indivíduos
         s = s_head + f_tail
     return validate_solution(f), validate_solution(s)
 
 def mutate(g, mutation_rate, displacement_rate):
     if random.random() < mutation_rate: #se o número randômico gerado é menor do que taxa de mutação
-        p = random.randint(0, n-1) #escolhe um gene aleatório para mutar
+        point = random.randint(0, instance.n-1) #escolhe um gene aleatório para mutar
         if random.random() < displacement_rate: #se número randômico gerado é menor do que taxa de desalocação
-            g[p] = 0 #desaloca o passageiro
+            g[point] = 0 #desaloca o passageiro
         else: #se não, muda o voo
-            g[p] = random.randint(1, k)
+            g[point] = random.randint(1, instance.k)
     return validate_solution(g)
 
 def initial_population(population_size):
@@ -100,6 +99,7 @@ def run_ga(population_size, crossover_rate, elitism, mutation_rate, displacement
     individuals = initial_population(population_size)
     generations_without_improve= 0
     for generation in range(max_generations):
+        print("generation", generation)
         new_individuals = []
         if elitism:         
             best_individual = tournament(individuals)
@@ -121,6 +121,12 @@ def run_ga(population_size, crossover_rate, elitism, mutation_rate, displacement
     return tournament(individuals)
 
 if __name__ == "__main__":
-    melhor_individuo = run_ga(30, 0.9, True, 0.75, 0.2, 20, 200, 10)
-    print(melhor_individuo)
-    print(evaluate(melhor_individuo))
+    for i in range(1, 13):
+        if i < 10:
+            instance_name = "VA0"+str(i)
+        else:
+            instance_name = "VA"+str(i)
+        instance = ReadInstance(instance_name+".dat")
+        print("Resolving instance", i)
+        melhor_individuo = run_ga(10, 0.9, True, 0.75, 0.2, 3, 15, 10)
+        log(i, evaluate(melhor_individuo), melhor_individuo)
