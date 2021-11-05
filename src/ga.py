@@ -3,11 +3,6 @@ import random
 from numpy.core.numeric import Infinity
 import numpy as np
 
-from read_file import ReadInstance
-from logging import log
-
-instance = None
-
 def evaluate(g):
     individual_profit = 0
     for i in range(instance.n):
@@ -70,12 +65,13 @@ def crossover(f, s, crossover_rate):
     return validate_solution(f), validate_solution(s)
 
 def mutate(g, mutation_rate, displacement_rate):
-    if random.random() < mutation_rate: #se o número randômico gerado é menor do que taxa de mutação
-        point = random.randint(0, instance.n-1) #escolhe um gene aleatório para mutar
-        if random.random() < displacement_rate: #se número randômico gerado é menor do que taxa de desalocação
-            g[point] = 0 #desaloca o passageiro
-        else: #se não, muda o voo
-            g[point] = random.randint(1, instance.k)
+    for i in range(instance.n):
+        if random.random() < mutation_rate: #se o número randômico gerado é menor do que taxa de mutação
+            #point = random.randint(0, instance.n-1) #escolhe um gene aleatório para mutar
+            if random.random() < displacement_rate: #se número randômico gerado é menor do que taxa de desalocação
+                g[i] = 0 #desaloca o passageiro
+            else: #se não, muda o voo
+                g[i] = random.randint(1, instance.k)
     return validate_solution(g)
 
 def initial_population(population_size):
@@ -94,7 +90,9 @@ def selection(individuos, k):
 
     return melhor_individuo, segundo_melhor
 
-def run_ga(population_size, crossover_rate, elitism, mutation_rate, displacement_rate, max_generations_without_improve, max_generations, seed):
+def run_ga(population_size, crossover_rate, elitism, mutation_rate, displacement_rate, max_generations_without_improve, max_generations, seed, new_instance):
+    global instance 
+    instance = new_instance
     random.seed(seed)
     individuals = initial_population(population_size)
     generations_without_improve= 0
@@ -118,15 +116,6 @@ def run_ga(population_size, crossover_rate, elitism, mutation_rate, displacement
         individuals = new_individuals
         if generations_without_improve > max_generations_without_improve:
             break
-    return tournament(individuals)
-
-if __name__ == "__main__":
-    for i in range(1, 13):
-        if i < 10:
-            instance_name = "VA0"+str(i)
-        else:
-            instance_name = "VA"+str(i)
-        instance = ReadInstance(instance_name+".dat")
-        print("Resolving instance", i)
-        melhor_individuo = run_ga(10, 0.9, True, 0.75, 0.2, 5, 30, 10)
-        log(i, evaluate(melhor_individuo), melhor_individuo)
+    best_individual = tournament(individuals)
+    best_score = evaluate(best_individual)
+    return best_score, best_individual

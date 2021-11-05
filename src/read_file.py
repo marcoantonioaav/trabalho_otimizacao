@@ -45,13 +45,6 @@ def read_p(lines, n):
     return p 
 
 class ReadInstance:
-    n = 0
-    k = 1
-    p = []
-    P =  []
-    cI = []
-    cP = []
-
     def __init__(self, filename):
         lines = [i.strip().split() for i in open("./data/"+filename).readlines()]
         self.n = read_n(lines)
