@@ -16,7 +16,7 @@ def evaluate(g):
     pair_profit = 0
     for i in range(instance.n):
         for j in range(instance.n):
-            if g[i] == g[j]:
+            if g[i] == g[j] and g[i] != 0:
                 pair_profit += instance.cP[i][j]
     return individual_profit + (pair_profit/2)
 
@@ -48,7 +48,7 @@ def initial_solution():
 
 def tournament(participants):
     best_individual = participants[0]
-    best_profit = Infinity
+    best_profit = -Infinity
 
     for individual in participants:
         profit = evaluate(individual)
@@ -128,5 +128,5 @@ if __name__ == "__main__":
             instance_name = "VA"+str(i)
         instance = ReadInstance(instance_name+".dat")
         print("Resolving instance", i)
-        melhor_individuo = run_ga(10, 0.9, True, 0.75, 0.2, 3, 15, 10)
+        melhor_individuo = run_ga(10, 0.9, True, 0.75, 0.2, 5, 30, 10)
         log(i, evaluate(melhor_individuo), melhor_individuo)
