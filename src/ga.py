@@ -9,6 +9,18 @@ def evaluate(g):
         if g[i] != 0:
             individual_profit += instance.cI[i]
     pair_profit = 0
+    for i in range(1,instance.n):
+        for j in range(i):
+            if g[i] == g[j] and g[i] != 0:
+                pair_profit += instance.cP[i][j]
+    return individual_profit + (pair_profit)
+
+def old_evalute(g):
+    individual_profit = 0
+    for i in range(instance.n):
+        if g[i] != 0:
+            individual_profit += instance.cI[i]
+    pair_profit = 0
     for i in range(instance.n):
         for j in range(instance.n):
             if g[i] == g[j] and g[i] != 0:
@@ -80,15 +92,25 @@ def initial_population(population_size):
         individuals[i] = initial_solution()
     return individuals
 
-def selection(individuos, k):
-    random.shuffle(individuos)
-    k_individuos = individuos[:k]
-    melhor_individuo = tournament(k_individuos)
-    k_individuos.remove(melhor_individuo)
-    segundo_melhor = tournament(k_individuos)
-    k_individuos.append(melhor_individuo)
+def selection(individuos):
+    best_individual = individuos[0]
+    second_best = individuos[0]
+    best_profit = -Infinity
 
-    return melhor_individuo, segundo_melhor
+    for individual in individuos:
+        profit = evaluate(individual)
+        if profit > best_profit:
+            second_best = best_individual
+            best_individual = individual
+            best_profit = profit
+
+    return best_individual, second_best
+
+def deep_copy(original,copy):
+    for i in original:
+        copy.append(i)
+    return copy
+
 
 def run_ga(population_size, crossover_rate, elitism, mutation_rate, displacement_rate, max_generations_without_improve, max_generations, seed, new_instance):
     global instance 
@@ -96,20 +118,25 @@ def run_ga(population_size, crossover_rate, elitism, mutation_rate, displacement
     random.seed(seed)
     individuals = initial_population(population_size)
     generations_without_improve= 0
+    best_individual, second_best = selection(individuals)
     for generation in range(max_generations):
         print("generation", generation)
         new_individuals = []
         if elitism:         
-            best_individual = tournament(individuals)
             new_individuals.append(best_individual)
         while len(new_individuals) < population_size:
-            best_individual, second_best = selection(individuals, population_size)
-            best_individual, second_best = crossover(best_individual, second_best, crossover_rate)
-            best_individual = mutate(best_individual, mutation_rate, displacement_rate)
-            second_best = mutate(second_best, mutation_rate, displacement_rate)
-            new_individuals.append(best_individual)
-            new_individuals.append(second_best)
-        if evaluate(tournament(individuals)) == evaluate(tournament(new_individuals)):
+            new_best = []
+            new_second = []
+            new_best = deep_copy(best_individual,new_best)
+            new_second = deep_copy(second_best,new_second)
+            new_best, new_second = crossover(new_best, new_second, crossover_rate)
+            new_best = mutate(new_best, mutation_rate, displacement_rate)
+            new_second = mutate(new_second, mutation_rate, displacement_rate)
+            new_individuals.append(new_best)
+            new_individuals.append(new_second)
+        best_old_value = evaluate(best_individual)
+        best_individual, second_best = selection(new_individuals)
+        if best_old_value >= evaluate(best_individual):
             generations_without_improve += 1
         else:
             generations_without_improve = 0
