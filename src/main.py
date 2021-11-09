@@ -46,7 +46,8 @@ def complete_test():
         {"name":"max_generations", "test_range": range(30, 330, 30), "default": 150}
     ]
     
-    for p in range(1):
+    for p in range(1, 2):
+        log_csv(parameters[p]["name"], "parâmetro", "otimalidade", "tempo")
         test_parameters = []
         for attribute in parameters:
             test_parameters.append(attribute["default"])
@@ -60,7 +61,7 @@ def complete_test():
                 else:
                     instance_name = "VA"+str(i)
                 instance = ReadInstance(instance_name+".dat")
-                print("Resolving parameter "+parameters[p]["name"]+", instance "+instance_name)
+                print("Resolving parameter "+parameters[p]["name"]+"="+str(test_value)+", instance "+instance_name)
                 start = timeit.default_timer()
                 z, x = run_ga(test_parameters[0], test_parameters[1], test_parameters[2], test_parameters[3], test_parameters[4], test_parameters[5], test_parameters[6], 10, instance)
                 stop = timeit.default_timer()
