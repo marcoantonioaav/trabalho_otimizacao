@@ -46,8 +46,8 @@ def complete_test():
         {"name":"max_generations", "test_range": range(30, 330, 30), "default": 150}
     ]
     
-    for p in range(1, 2):
-        log_csv(parameters[p]["name"], "parâmetro", "otimalidade", "tempo")
+    for p in range(2, len(parameters)):
+        log_csv(parameters[p]["name"], "parametro", "otimalidade", "tempo")
         test_parameters = []
         for attribute in parameters:
             test_parameters.append(attribute["default"])
