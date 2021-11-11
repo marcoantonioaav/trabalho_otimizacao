@@ -1,2 +1,1 @@
 # trabalho_otimizacao
- 

@@ -6,14 +6,14 @@ import numpy as np
 import timeit
 
 def ga_test():
-    for i in range(1, 13):
+    for i in range(1, 4):
         if i < 10:
             instance_name = "VA0"+str(i)
         else:
             instance_name = "VA"+str(i)
         instance = ReadInstance(instance_name+".dat")
         print("Resolving instance", i)
-        z, x = run_ga(100, 0.9, True, 0.03, 0.2, 100, 1000, 10, instance)
+        z, x = run_ga(100, 0.9, True, 0.03, 0.2, 0.5, 100, 1000, 10, instance)
         log(i, z, x, "ga")
         #z, x = solve(instance, instance_name)
         #log(i, z, x, "solver")
@@ -42,6 +42,7 @@ def complete_test():
         {"name":"elitism", "test_range": [False, True], "default": True}, 
         {"name":"mutation_rate", "test_range": np.arange(0, 0.11, 0.01), "default": 0.02}, 
         {"name":"displacement_rate", "test_range": np.arange(0, 1.1, 0.1), "default": 0.3}, 
+        {"name":"shuffle_rate", "test_range": np.arange(0, 1.1, 0.1), "default": 0.3}, 
         {"name":"max_generations_without_improve", "test_range": range(5, 55, 5), "default": 20}, 
         {"name":"max_generations", "test_range": range(30, 330, 30), "default": 150}
     ]
@@ -63,7 +64,7 @@ def complete_test():
                 instance = ReadInstance(instance_name+".dat")
                 print("Resolving parameter "+parameters[p]["name"]+"="+str(test_value)+", instance "+instance_name)
                 start = timeit.default_timer()
-                z, x = run_ga(test_parameters[0], test_parameters[1], test_parameters[2], test_parameters[3], test_parameters[4], test_parameters[5], test_parameters[6], 10, instance)
+                z, x = run_ga(test_parameters[0], test_parameters[1], test_parameters[2], test_parameters[3], test_parameters[4], test_parameters[5], test_parameters[6], test_parameters[7], 10, instance)
                 stop = timeit.default_timer()
                 optimality = percentage(z, best_value[instance_name])
                 optimality_avg += optimality
