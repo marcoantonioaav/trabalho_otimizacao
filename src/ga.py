@@ -14,19 +14,7 @@ def evaluate(g):
         for j in range(i):
             if g[i] == g[j] and g[i] != 0:
                 pair_profit += instance.cP[i][j]
-    return individual_profit + (pair_profit)
-
-def old_evalute(g):
-    individual_profit = 0
-    for i in range(instance.n):
-        if g[i] != 0:
-            individual_profit += instance.cI[i]
-    pair_profit = 0
-    for i in range(instance.n):
-        for j in range(instance.n):
-            if g[i] == g[j] and g[i] != 0:
-                pair_profit += instance.cP[i][j]
-    return individual_profit + (pair_profit/2)
+    return individual_profit + pair_profit
 
 def is_valid_solution(g):
     total_weight = np.zeros(instance.k) #inicializa os pesos com zero
@@ -53,18 +41,6 @@ def initial_solution():
     for i in range(instance.n):
         g[i] = random.randint(1, instance.k) #inicializa com valores de 1 até k
     return validate_solution(g)
-
-def tournament(participants):
-    best_individual = participants[0]
-    best_profit = -Infinity
-
-    for individual in participants:
-        profit = evaluate(individual)
-        if profit > best_profit:
-            best_individual = individual
-            best_profit = profit
-
-    return best_individual
 
 def crossover(f, s, crossover_rate):
     if random.random() < crossover_rate:
@@ -93,12 +69,12 @@ def initial_population(population_size):
         individuals[i] = initial_solution()
     return individuals
 
-def selection(individuos):
-    best_individual = individuos[0]
-    second_best = individuos[0]
+def selection(individuals):
+    best_individual = individuals[0]
+    second_best = individuals[0]
     best_profit = -Infinity
 
-    for individual in individuos:
+    for individual in individuals:
         profit = evaluate(individual)
         if profit > best_profit:
             second_best = best_individual
@@ -112,19 +88,14 @@ def deep_copy(original,copy):
         copy.append(i)
     return copy
 
-def shuffle(g, shuffle_rate):
-    if random.random() < shuffle_rate:
-        random.shuffle(g)
-        return validate_solution(g)
-    return g
-
-def run_ga(population_size, crossover_rate, elitism, mutation_rate, displacement_rate, shuffle_rate, max_generations_without_improve, max_generations, seed, new_instance):
+def run_ga(population_size, crossover_rate, elitism, mutation_rate, displacement_rate, max_generations_without_improve, seed, new_instance):
     global instance 
     instance = new_instance
     random.seed(seed)
     individuals = initial_population(population_size)
     generations_without_improve= 0
     best_individual, second_best = selection(individuals)
+    max_generations = 10*max_generations_without_improve
     for generation in range(max_generations):
         print("generation", generation)
         new_individuals = []
@@ -136,8 +107,6 @@ def run_ga(population_size, crossover_rate, elitism, mutation_rate, displacement
             new_best = deep_copy(best_individual,new_best)
             new_second = deep_copy(second_best,new_second)
             new_best, new_second = crossover(new_best, new_second, crossover_rate)
-            new_best = shuffle(new_best, shuffle_rate)
-            new_second = shuffle(new_second, shuffle_rate)
             new_best = mutate(new_best, mutation_rate, displacement_rate)
             new_second = mutate(new_second, mutation_rate, displacement_rate)
             new_individuals.append(new_best)
@@ -151,6 +120,5 @@ def run_ga(population_size, crossover_rate, elitism, mutation_rate, displacement
         individuals = new_individuals
         if generations_without_improve > max_generations_without_improve:
             break
-    best_individual = tournament(individuals)
     best_score = evaluate(best_individual)
     return best_score, best_individual
