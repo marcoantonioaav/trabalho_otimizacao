@@ -13,7 +13,7 @@ def ga_test():
             instance_name = "VA"+str(i)
         instance = ReadInstance(instance_name+".dat")
         print("Resolving instance", i)
-        z, x = run_ga(100, 0.9, True, 0.03, 0.2, 100, 10, instance)
+        z, x = run_ga(70, 0.9, True, 0.02, 0.1, 70, 11, instance)
         log_result(i, z, x, "ga")
         #z, x = solve(instance, instance_name)
         #log_result(i, z, x, "solver")
@@ -37,12 +37,12 @@ def complete_test():
         "VA12": 112354
     }
     parameters = [
-        {"name":"population_size", "test_range": range(10, 110, 10), "default": 50}, 
+        {"name":"population_size", "test_range": range(7, 77, 7), "default": 35}, 
         {"name":"crossover_rate", "test_range": np.arange(0, 1.1, 0.1), "default": 0.9}, 
         {"name":"elitism", "test_range": [False, True], "default": True}, 
         {"name":"mutation_rate", "test_range": np.arange(0, 0.11, 0.01), "default": 0.02}, 
-        {"name":"displacement_rate", "test_range": np.arange(0, 1.1, 0.1), "default": 0.3},
-        {"name":"max_generations_without_improve", "test_range": range(10, 110, 10), "default": 50} 
+        {"name":"displacement_rate", "test_range": np.arange(0, 1.1, 0.1), "default": 0.2},
+        {"name":"max_generations_without_improve", "test_range": range(7, 77, 7), "default": 35} 
     ]
     seeds = [13, 14, 15]
     
