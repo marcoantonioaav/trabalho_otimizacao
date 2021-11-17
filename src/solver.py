@@ -32,12 +32,6 @@ def solve(instance, instance_name, solver_time_limit):
             line[j] = LpVariable(name="estaNoAviao"+str(i)+"_"+str(j), lowBound=0, cat="Binary")
         estaNoAviao[i] = line
 
-    #noMesmoAviao = [None]*instance.n
-    #for i in range(instance.n):
-    #    line = [None]*instance.n
-    #    for j in range(instance.n):
-    #        line[j] = LpVariable(name="noMesmoAviao"+str(i)+str(j), lowBound=0, cat="Binary")
-    #    noMesmoAviao[i] = line
     noMesmoAviao = [None]*instance.n
     for i in range(instance.n):
         line = [None]*(i+1)
@@ -81,10 +75,8 @@ def solve(instance, instance_name, solver_time_limit):
             obj_cp.append(instance.cP[p1][p2]*noMesmoAviao[p1][p2])
     model += lpSum(obj_ci + obj_cp)
 
-    #print(pulp.LpSolverDefault)
     # Solve the problem
     solver = pulp.PULP_CBC_CMD(timeLimit=solver_time_limit)
     status = model.solve(solver)
-    #status = solver.findSolutionValues(model)
 
     return model.objective.value(), convert_sa_to_g(s, a)
