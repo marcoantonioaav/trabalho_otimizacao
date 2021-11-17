@@ -55,18 +55,34 @@ function read_p(lines, n)
     p 
 end
 
-function log_result(instance_name, A, S, z)
+function log_result(instance_name, A, S, z, n)
+    println(instance_name)
+    for i=1:n
+        print(string(value(A[i]))*" ")
+    end
+    print("\n")
+    for i=1:n
+        print(string(value(S[i]))*" ")
+    end
+    print("\n")
+    println(z)
     open("./log/results.log", "a") do io
         println(io, instance_name)
-        println(io, A)
-        println(io, S)
+        for i=1:n
+            print(io, string(value(A[i]))*" ")
+        end
+        print(io, "\n")
+        for i=1:n
+            print(io, string(value(S[i]))*" ")
+        end
+        print(io, "\n")
         println(io, z)
     end;
 end
 
 function solve(instance_name, n, k, cI, cP, p, P)
     m = Model();
-    set_optimizer(m, GLPK.Optimizer);
+    set_optimizer(m, GLPK.Optimizer; bridge_constraints=false)
 
     @variable(m, estaNoAviao[1:n, 1:k] >= 0, Bin);  #estaNoAviao[i, j] = a pessoa i está no avião j? 
     @variable(m, noMesmoAviao[1:n, 1:n] >= 0, Bin);  #noMesmoAviao[i, j] = a pessoa i está no avião mesmo aviao de j? 
@@ -76,12 +92,12 @@ function solve(instance_name, n, k, cI, cP, p, P)
     @variable(m, A[1:n] >= 1, Int);  #aloca as pessoas nos avioes (qual aviao A[i] esta a pessoa i)
     @variable(m, S[1:n] >= 0, Bin);  #seleção de pessoas (a pessoa i esta em um aviao?)
 
-    @objective(m, Max, sum(cI[pessoa]*S[pessoa] for pessoa=1:n) + sum(cP[p1][p2]*noMesmoAviao[p1, p2] for p1=1:n for p2=1:n)/2);
+    @objective(m, Max, sum(cI[pessoa]*S[pessoa] for pessoa=1:n) + sum(cP[p1][p2]*noMesmoAviao[p1, p2] for p1=1:n for p2=1:p1));
 
     for pessoa=1:n
         @constraint(m, A[pessoa] <= k); #Limita valores de aviões
         @constraint(m, sum(estaNoAviao[pessoa, aviao] for aviao=1:k) == S[pessoa]); #Se uma pessoa está em qualquer avião, esta pessoa foi selecionada
-        for pessoa2=1:n
+        for pessoa2=1:pessoa
             @constraint(m, A[pessoa] <= A[pessoa2] + M*(1- noMesmoAviao[pessoa, pessoa2])); #Se o avião de duas pessoas são iguais então estão no mesmo avião
             @constraint(m, M*(1- noMesmoAviao[pessoa, pessoa2]) + A[pessoa] >= A[pessoa2]); #Se o avião de duas pessoas são iguais então estão no mesmo avião
             @constraint(m, noMesmoAviao[pessoa, pessoa2] <= S[pessoa]); #Duas pessoas só podem estar no mesmo avião se estão em algum avião
@@ -97,9 +113,10 @@ function solve(instance_name, n, k, cI, cP, p, P)
         
     end
 
+    set_time_limit_sec(m, 5400)
     println("Solving instance "*instance_name)
     optimize!(m);
-    log_result(instance_name, A, S, objective_value(m));
+    log_result(instance_name, A, S, objective_value(m), n);
 end
 
 function solve_instance(i)
@@ -121,8 +138,9 @@ function solve_instance(i)
     solve(instance_name, n, k, cI, cP, p, P)
 end
 
-for i=1:12
+for i=7:12
     solve_instance(i)
 end
 
+#solve("exemplo", 3, 2, [1 0 2], [0 1 2; 1 0 1; 2 1 0], [50 40 50], [100 100])
 #log_result("instância_fake", [1 2 3], [0 1 0], 6)

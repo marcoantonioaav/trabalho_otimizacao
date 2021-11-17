@@ -3,6 +3,8 @@ import random
 from numpy.core.numeric import Infinity
 import numpy as np
 
+from read_file import ReadInstance
+
 def evaluate(g):
     individual_profit = 0
     if g[0] != 0:
@@ -37,7 +39,7 @@ def validate_solution(g):
     return g
 
 def initial_solution():
-    g = [None]*instance.n #gera novo vetor de inteiros
+    g = [None]*instance.n #gera novo vetor vazio
     for i in range(instance.n):
         g[i] = random.randint(1, instance.k) #inicializa com valores de 1 até k
     return validate_solution(g)
@@ -56,10 +58,9 @@ def crossover(f, s, crossover_rate):
 def mutate(g, mutation_rate, displacement_rate):
     for i in range(instance.n):
         if random.random() < mutation_rate: #se o número randômico gerado é menor do que taxa de mutação
-            #point = random.randint(0, instance.n-1) #escolhe um gene aleatório para mutar
             if random.random() < displacement_rate: #se número randômico gerado é menor do que taxa de desalocação
                 g[i] = 0 #desaloca o passageiro
-            else: #se não, muda o voo
+            else: #senão, muda o voo
                 g[i] = random.randint(1, instance.k)
     return validate_solution(g)
 
@@ -122,3 +123,8 @@ def run_ga(population_size, crossover_rate, elitism, mutation_rate, displacement
             break
     best_score = evaluate(best_individual)
     return best_score, best_individual
+
+
+#instance = ReadInstance("VA02.dat")
+#print(evaluate([1, 3, 1, 2, 3, 0, 1, 3, 4, 3, 1, 2, 1, 0, 0, 1, 3, 4, 3, 3, 0, 3, 2, 1, 1, 3, 1, 2, 3, 0, 3, 4, 0, 3, 3, 2, 4, 3, 4, 0, 0, 3, 4, 0, 1, 3, 2, 3, 2, 1, 0, 2, 3, 0, 3, 1, 2, 3, 3, 2, 4, 0, 0, 4, 0, 4, 4, 3, 2, 4, 4, 0, 3, 0, 0, 0, 4, 3, 4, 4, 3, 2, 4, 4, 4, 0, 4, 4, 0, 3, 1, 0, 3, 3, 4, 0, 4, 0, 4, 3]))
+#print(is_valid_solution([1, 3, 1, 2, 3, 0, 1, 3, 4, 3, 1, 2, 1, 0, 0, 1, 3, 4, 3, 3, 0, 3, 2, 1, 1, 3, 1, 2, 3, 0, 3, 4, 0, 3, 3, 2, 4, 3, 4, 0, 0, 3, 4, 0, 1, 3, 2, 3, 2, 1, 0, 2, 3, 0, 3, 1, 2, 3, 3, 2, 4, 0, 0, 4, 0, 4, 4, 3, 2, 4, 4, 0, 3, 0, 0, 0, 4, 3, 4, 4, 3, 2, 4, 4, 4, 0, 4, 4, 0, 3, 1, 0, 3, 3, 4, 0, 4, 0, 4, 3]))

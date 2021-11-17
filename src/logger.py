@@ -1,5 +1,5 @@
-def log_result(instance, z, x, method):
-    log_phrase = "z= "+str(z)+", x= "+str(x)
+def log_result(instance, z, x, method, time):
+    log_phrase = "z= "+str(z)+", x= "+str(x)+", time= "+str(time)
     print(log_phrase)
     with open("./log/"+str(instance)+"_"+method+".log", 'a') as f:
         print(log_phrase, file=f)
