@@ -6,17 +6,17 @@ import numpy as np
 import timeit
 
 def ga_test():
-    for i in range(1, 13):
+    for i in range(1, 2):
         if i < 10:
             instance_name = "VA0"+str(i)
         else:
             instance_name = "VA"+str(i)
         instance = ReadInstance(instance_name+".dat")
         print("Resolving instance", i)
-        z, x = run_ga(70, 0.9, True, 0.02, 0.1, 70, 11, instance)
-        log_result(i, z, x, "ga")
-        #z, x = solve(instance, instance_name)
-        #log_result(i, z, x, "solver")
+       # z, x = run_ga(70, 0.9, True, 0.02, 0.1, 70, 11, instance)
+        #log_result(i, z, x, "ga")
+        z, x = solve(instance, instance_name)
+        log_result(i, z, x, "solver")
 
 def percentage(part, whole):
     return 100 * float(part)/float(whole)
@@ -44,7 +44,7 @@ def complete_test():
         {"name":"displacement_rate", "test_range": np.arange(0, 1.1, 0.1), "default": 0.2},
         {"name":"max_generations_without_improve", "test_range": range(7, 77, 7), "default": 35} 
     ]
-    seeds = [13, 14, 15]
+    seeds = [16, 17]
     
     for p in range(len(parameters)):
         incialize_log_csv(parameters[p]["name"], seeds)
@@ -78,4 +78,4 @@ def complete_test():
                 time_list.append(time_avg)
             log_csv_multiple_seeds(parameters[p]["name"], test_value, optimality_list, time_list)
 if __name__ == "__main__":
-    ga_test()
+    complete_test()
