@@ -47,7 +47,7 @@ def complete_test():
         {"name":"displacement_rate", "test_range": np.arange(0, 1.1, 0.1), "default": 0.2},
         {"name":"max_generations_without_improve", "test_range": range(7, 77, 7), "default": 35} 
     ]
-    seeds = [13, 14, 15]
+    seeds = [13, 14, 15, 16, 17]
     
     for p in range(len(parameters)):
         incialize_log_csv(parameters[p]["name"], seeds)
@@ -80,5 +80,7 @@ def complete_test():
                 optimality_list.append(optimality_avg)
                 time_list.append(time_avg)
             log_csv_multiple_seeds(parameters[p]["name"], test_value, optimality_list, time_list)
+
 if __name__ == "__main__":
     ga_test()
+    complete_test()

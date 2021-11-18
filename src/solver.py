@@ -1,6 +1,4 @@
-# https://realpython.com/linear-programming-python/
-
-from pulp import LpMaximize, LpProblem, LpStatus, lpSum, LpVariable
+from pulp import LpMaximize, LpProblem, lpSum, LpVariable
 import pulp # pip install pulp
 
 def convert_sa_to_g(s, a):
