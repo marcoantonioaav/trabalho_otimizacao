@@ -17,6 +17,15 @@ def ga_test():
         z, x = run_ga(70, 0.9, True, 0.02, 0.1, 70, 11, instance)
         stop = timeit.default_timer()
         log_result(i, z, x, "ga", stop - start)
+
+def solver_test():
+    for i in range(1, 13):
+        if i < 10:
+            instance_name = "VA0"+str(i)
+        else:
+            instance_name = "VA"+str(i)
+        instance = ReadInstance(instance_name+".dat")
+        print("Resolving instance", i)
         solver_time_limit = 1800
         z, x = solve(instance, instance_name, solver_time_limit)
         log_result(i, z, x, "solver", solver_time_limit)
@@ -24,7 +33,7 @@ def ga_test():
 def percentage(part, whole):
     return 100 * float(part)/float(whole)
 
-def complete_test():
+def parameter_test():
     best_value = {
         "VA01": 29234,
         "VA02": 22509,
@@ -83,4 +92,5 @@ def complete_test():
 
 if __name__ == "__main__":
     ga_test()
-    complete_test()
+    solver_test()
+    parameter_test()
